@@ -3,6 +3,7 @@ from flaskr.models import db, User, Post
 from werkzeug.security import check_password_hash, generate_password_hash
 import functools
 
+
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
@@ -54,6 +55,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.id
+            g.user = user
             return redirect(url_for('index'))
         flash(error)
     return render_template('auth/login.html')

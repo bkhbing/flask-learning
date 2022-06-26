@@ -45,11 +45,5 @@ def create_app(config=None):
     # 测试
     @app.route('/hello')
     def hello():
-        user = models.User.query.all()
-        print(user)
-        
-    
         return 'Hello, World!'
     return app
-
- 
