@@ -2,7 +2,9 @@ from flask import Blueprint, flash, g,redirect, render_template, request, sessio
 from flaskr.models import db, User, Post
 from werkzeug.security import check_password_hash, generate_password_hash
 import functools
-
+from flask_login  import login_user
+from flask_login  import logout_user
+from . import login_manager
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -26,7 +28,6 @@ def register():
         
         if error is None:
             user = User.query.filter_by(username=username).first()
-            print(user)
             if user:
                 error = f'用户名:{username}已注册.'
             else:
@@ -55,7 +56,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.id
-            g.user = user
+            login_user(user)
             return redirect(url_for('index'))
         flash(error)
     return render_template('auth/login.html')
@@ -67,6 +68,7 @@ def logout():
     Returns:
         _type_: _description_
     """
+    logout_user()
     session.clear()
     return redirect(url_for('index'))
 
@@ -81,20 +83,25 @@ def load_logged_in_user():
     else:
         g.user = User.query.filter_by(id=user_id).first()
 
-def login_required(view):
-    """判断用户是否登录
+# def login_required(view):
+#     """判断用户是否登录
 
-    Args:
-        view (_type_): _description_
+#     Args:
+#         view (_type_): _description_
 
-    Returns:
-        _type_: _description_
-    """
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
+#     Returns:
+#         _type_: _description_
+#     """
+#     @functools.wraps(view)
+#     def wrapped_view(**kwargs):
+#         if g.user is None:
+#             return redirect(url_for('auth.login'))
 
-        return view(**kwargs)
+#         return view(**kwargs)
 
-    return wrapped_view
+#     return wrapped_view
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)

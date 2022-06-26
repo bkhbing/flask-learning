@@ -25,6 +25,17 @@ class User(db.Model):
     password = db.Column(db.String(200), unique=True, comment='密码')
     def __repr__(self):
         return 'user:%s'% self.username
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):   
+        return True           
+
+    def is_anonymous(self):
+        return False          
+
+    def get_id(self):         
+        return str(self.id)
 
 class Post(db.Model):
     # 定义表名

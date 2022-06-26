@@ -3,9 +3,13 @@ import os
 from flask import Flask
 from flaskr import models
 from flaskr.config import DevelopmentConfig
+from flask_login import LoginManager
 
+login_manager = LoginManager()
 
 def init_app(app):
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
     models.db.init_app(app)
     app.cli.add_command(models.init_db_command)
 

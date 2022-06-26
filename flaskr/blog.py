@@ -3,7 +3,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, session, request, url_for
 )
 from werkzeug.exceptions import abort
-from flaskr.auth import login_required
+# from flaskr.auth import login_required
+from flask_login import login_required
 from flaskr.models import db, Post
 import time
 
@@ -34,7 +35,7 @@ def create():
             flash(error)
         else:
             created = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-            post = Post(user_id=session['user_id'], title=title, body=body, created=created)
+            post = Post(user_id=g.user.id, title=title, body=body, created=created)
             db.session.add(post)
             db.session.commit()
             return redirect(url_for('blog.index'))
@@ -46,7 +47,7 @@ def get_post(id, check_author=True):
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
-    if check_author and post.user_id != session['user_id']:
+    if check_author and post.user_id != g.user.id:
         abort(403)
 
     return post
